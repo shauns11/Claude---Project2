@@ -19,13 +19,13 @@ Execute R scripts from Visual Studio Code, with logging and timestamping. Script
 Run all scripts in order:
 
 ```powershell
-Get-ChildItem "code\*.r" | Sort-Object Name | ForEach-Object { Rscript $_.FullName }
+Get-ChildItem "code\*.r" | Sort-Object Name | ForEach-Object { & "C:\Program Files (x86)\R\R-4.6.1\bin\Rscript.exe" $_.FullName }
 ```
 
 To run a single script:
 
 ```powershell
-Rscript "code\01.R_commands.r"
+& "C:\Program Files (x86)\R\R-4.6.1\bin\Rscript.exe" "code\01.R_commands.r"
 ```
 
 ## R Script Template
@@ -35,10 +35,14 @@ Rscript "code\01.R_commands.r"
 library(haven)
 
 # Commands
+# ...open and start log file
+
 # ... analysis code ...
 
 # Timestamp
 print(Sys.time())
+
+# Stop log file
 ```
 
 ## R Conventions
@@ -72,7 +76,7 @@ Remote: `https://github.com/shauns11/Claude---Project2.git` (branch `main`). The
 git init -b main
 git add .
 git status --short             # files to be committed
-git status --short --ignored   # lines starting "!!" are ignored (e.g. 01.log)
+git status --short --ignored   # lines starting "!!" are ignored (e.g. 01.R_commands.txt)
 git commit -m "Initial commit"
 ```
 

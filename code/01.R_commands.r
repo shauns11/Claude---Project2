@@ -1,17 +1,18 @@
-# Libraries.
+# Libraries
 library(haven)
 
+# Open log file
+dir.create("output", showWarnings = FALSE)
+sink(file.path("output", "01.R_commands.txt"), split = TRUE)
 
-# open and start log file.
-if (!dir.exists("C:/CLAUDE/Projects/Project2/output")) {
-  dir.create("C:/CLAUDE/Projects/Project2/output")
-}
-log_file <- file.path("C:/CLAUDE/Projects/Project2/output", "01.R_commands.txt")
-sink(log_file, append = FALSE, split = TRUE)
+# Commands
+print(2 + 2)
 
-#commands.
-print(2+2) 
-#timestamp
+# Session info
+sessionInfo()
+
+# Timestamp
 print(Sys.time())
-# Stop logging
+
+# Stop log file
 sink()

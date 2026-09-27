@@ -16,6 +16,8 @@ Execute R scripts from Visual Studio Code, with logging and timestamping. Script
 
 ## Running R Scripts
 
+Run from the working directory (scripts use paths relative to it, e.g. `output\`).
+
 Run all scripts in order:
 
 ```powershell
@@ -28,27 +30,40 @@ To run a single script:
 & "C:\Program Files (x86)\R\R-4.6.1\bin\Rscript.exe" "code\01.R_commands.r"
 ```
 
+### Known issue
+
+After loading `haven` (or its dependencies `cli`, `rlang`, `vctrs`), Rscript crashes on exit with code `-1073741569` (`0xC00000FF`, faulting module `ntdll.dll`). All output and logs are written before the crash, so results are complete; treat this exit code as success. Reinstalling `cli` did not fix it.
+
 ## R Script Template
+
+Replace `NN.description` with the script's own name, so each script writes its own log.
 
 ```r
 # Libraries
 library(haven)
 
-# Commands
-# ...open and start log file
+# Open log file
+dir.create("output", showWarnings = FALSE)
+sink(file.path("output", "NN.description.txt"), split = TRUE)
 
+# Commands
 # ... analysis code ...
+
+# Session info
+sessionInfo()
 
 # Timestamp
 print(Sys.time())
 
 # Stop log file
+sink()
 ```
 
 ## R Conventions
 
 - Name scripts with a numeric prefix: `01.description.r`, `02.description.r`, etc.
 - Scripts run sequentially; numbering reflects execution order.
+- Use relative paths (`output\`, `data\`), not the full project path.
 - Output files (logs, tables, figures) go to `output\`.
 - Datasets go to `data\`.
 - `haven` is the standard package for loading `.sas7bdat`, `.sav`, and `.dta` files.
@@ -57,7 +72,28 @@ print(Sys.time())
 
 Remote: `https://github.com/shauns11/Claude---Project2.git` (branch `main`). The GitHub CLI (`gh`) is not installed, so use plain `git` and the GitHub website.
 
-### First-time setup (new project)
+### Day-to-day
+
+```powershell
+git status                 # see what changed
+git add .                  # stage changes
+git commit -m "Message"    # commit
+git push                   # upload to GitHub
+```
+
+Notes:
+- Never use `git push --force` against a repository that already has history unless you intend to permanently replace it.
+- Warnings like "LF will be replaced by CRLF" are Windows line-ending notices and can be ignored.
+
+### What is tracked
+
+- Tracked: `code\` (R scripts), `CLAUDE.md`, `.gitignore`, and any non-ignored files in `output\` (e.g. tables, figures)
+- Ignored (see `.gitignore`):
+  - `*.dta` — Stata datasets, anywhere in the project
+  - `*.rds` — R datasets, anywhere in the project
+  - `*.txt` — log files, anywhere in the project (so logs in `output\` are not pushed)
+
+### First-time setup (new project, already done for this repo)
 
 1. Create `.gitignore` in the project root **before** the first commit, so ignored files are never committed:
 
@@ -95,25 +131,4 @@ git push -u origin main
 git status -sb                 # should show: ## main...origin/main
 ```
 
-6. Update the `Remote:` line at the top of this section.
-
-Notes:
-- Never use `git push --force` against a repository that already has history unless you intend to permanently replace it.
-- Warnings like "LF will be replaced by CRLF" are Windows line-ending notices and can be ignored.
-
-### Day-to-day
-
-```powershell
-git status                 # see what changed
-git add .                  # stage changes
-git commit -m "Message"    # commit
-git push                   # upload to GitHub
-```
-
-### What is tracked
-
-- Tracked: `code\` (R-scripts), `output\` (logs, tables, figures), `CLAUDE.md`, `.gitignore`
-- Ignored (see `.gitignore`):
-  - `*.rds` — R datasets, anywhere in the project
-
-
+6. Update the `Remote:` line at the top of the Git section.
